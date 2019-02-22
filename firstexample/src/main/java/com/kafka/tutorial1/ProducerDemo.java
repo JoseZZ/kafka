@@ -1,0 +1,43 @@
+package com.kafka.tutorial1;
+
+import java.util.Properties;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ProducerDemo {
+
+    private static Logger logger = LoggerFactory.getLogger(ProducerDemo.class);
+
+    public static final String BOOTSTRAP_SERVER = "127.0.0.1:9092";
+
+    public static void main(String[] args) {
+        // Create Producer properties
+        Properties properties = new Properties();
+        // Podemos buscar los nombres de las propiedades en la pagina de Kafka -> Producer Configs
+        properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
+        // Necesitamos los serializer para convertir las cadenas en bytes de datos
+        properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+
+        // Create the producer
+        // Pasaremos las propiedades que hemos configurado antes
+        KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
+
+        // Send data - asincrono
+        // Creamos un objeto con el nombre del topic y el valor que queremos enviar
+        final ProducerRecord<String, String> record = new ProducerRecord<String, String>("primer_topic", "Hola mundo");
+        // Esta seria la forma mas simple
+        producer.send(record);
+
+        // Para asegurar el envio ahora
+        producer.flush();
+        producer.close();
+
+        // Podemos lanzar un consumer con el siguiente comando
+        // kafka-console-consumer --bootstrap-server 127.0.0.1:9092 --topic first_topic --group my-first-app
+    }
+}
